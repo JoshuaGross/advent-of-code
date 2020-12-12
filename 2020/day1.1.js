@@ -1,17 +1,18 @@
 const fs = require('fs');
+const assert = require('assert');
+const permutation = require('../utils/permutation');
 
 module.exports = function runner(inputFile, verbose) {
   const input = fs.readFileSync(inputFile, 'utf8').split('\n').filter(x => !!x).map(x => parseInt(x, 10));
 
-  for (var i = 0; i < input.length; i++) {
-    for (var j = 0; j < input.length; j++) {
-      if (j === i) {
-        continue;
-      }
-
-      if (input[i] + input[j] === 2020) {
-        console.log(input[i], input[j], input[i] * input[j]);
+  const solution = (function () {
+    for (const perm of permutation(input, 2)) {
+      const [x, y] = perm;
+      if (x + y === 2020) {
+        return x * y;
       }
     }
-  }
+  }());
+  assert.equal(solution, 1010884);
+  console.log('Final Answer:', solution);
 };

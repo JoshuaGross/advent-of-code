@@ -11,14 +11,10 @@ function walkInputs (input) {
     if (dir === 'F') {
       w += waypointW * mag;
       n += waypointN * mag;
-    } else if (dir === 'N') {
-      waypointN += mag;
-    } else if (dir === 'S') {
-      waypointN -= mag;
-    } else if (dir === 'W') {
-      waypointW += mag;
-    } else if (dir === 'E') {
-      waypointW -= mag;
+    } else if (dir === 'N' || dir === 'S') {
+      waypointN += mag * (dir === 'S' ? -1 : 1);
+    } else if (dir === 'W' || dir === 'E') {
+      waypointW += mag * (dir === 'E' ? -1 : 1);
     } else if (dir === 'R' || dir === 'L') {
       [waypointW, waypointN] = rotateWestNorthDegrees(waypointW, waypointN, dir, mag);
     }
