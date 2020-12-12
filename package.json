@@ -1,0 +1,23 @@
+{
+  "name": "advent-of-code",
+  "version": "1.0.0",
+  "description": "This is my repo for [Advent of Code](https://adventofcode.com/) solutions.",
+  "main": "runner.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JoshuaGross/advent-of-code.git"
+  },
+  "author": "Joshua Gross <joshua.gross@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JoshuaGross/advent-of-code/issues"
+  },
+  "homepage": "https://github.com/JoshuaGross/advent-of-code#readme",
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "yargs": "^16.2.0"
+  }
+}
