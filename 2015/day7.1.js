@@ -11,6 +11,16 @@ function buildCircuit (instructions, verbose) {
   return registers;
 }
 
+function runOp (op, lhs, rhs) {
+  switch (op) {
+    case 'AND': return lhs & rhs;
+    case 'OR': return lhs | rhs;
+    case 'LSHIFT': return lhs << rhs;
+    case 'RSHIFT': return lhs >> rhs;
+    default: throw new Error('unknown operation: ' + op);
+  }
+}
+
 function runCircuit (circuit, register, verbose) {
   if (typeof register === 'number') {
     return register;
@@ -22,8 +32,6 @@ function runCircuit (circuit, register, verbose) {
   const operation = circuit[register];
 
   const value = (function () {
-    console.log('Running operation: ', operation);
-
     if (typeof operation === 'number') {
       return operation;
     }
@@ -41,11 +49,7 @@ function runCircuit (circuit, register, verbose) {
       const val1 = runCircuit(circuit, operation[0], verbose);
       const val2 = runCircuit(circuit, operation[2], verbose);
       const op = operation[1];
-      return (op === 'AND' ? val1 & val2 : (
-        op === 'OR' ? val1 | val2 :
-        (op === 'LSHIFT' ? val1 << val2 :
-          (op === 'RSHIFT' ? val1 >> val2 : (function () { throw new Error('unknown operation: ' + op); }())))
-      ));
+      return runOp(op, val1, val2);
     }
     throw new Error('Unknown operation: ' + operation);
   }());
@@ -67,4 +71,3 @@ module.exports = function runner(inputFile, verbose) {
   assert.equal(solution, 956);
   console.log('Final Answer:', solution);
 }
-

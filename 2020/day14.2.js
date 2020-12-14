@@ -1,16 +1,6 @@
 const fs = require('fs');
 const assert = require('assert');
-
-function powerset(input) {
-  return (function ps(list) {
-    if (list.length === 0) {
-      return [[]];
-    }
-    var head = list.pop();
-    var tailPS = ps(list);
-    return tailPS.concat(tailPS.map(function(e) { return [head].concat(e); }));
-  })(input.slice());
-}
+const powerset = require('../utils/powerset');
 
 function parseInput (txt) {
   const lines = txt.split('\n').filter(x => !!x);
@@ -36,7 +26,6 @@ function reverse (ary) {
 function applyMask(mask, input) {
   assert.equal(typeof input, 'number');
   const inputModified = input.toString(2).split('').reverse();
-  //console.log('mask 1', mask, reverse(inputModified).join(''));
   const alts = [];
   while (inputModified.length < 36) {
     inputModified.push('0');
@@ -91,11 +80,8 @@ mem[26] = 1`);
 
   const inputLines = parseInput(fs.readFileSync(inputFile, 'utf8'));
 
-  console.log(inputLines);
   const solution = sumResults(inputLines);
 
   assert.equal(solution, 2667858637669);
   console.log('Final Answer:', solution);
 }
-
-
