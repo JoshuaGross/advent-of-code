@@ -1,7 +1,5 @@
 const fs = require('fs');
 const assert = require('assert');
-//const manhattanDistance = require('../utils/manhattanDistance');
-//const cardinalTurn = require('../utils/cardinalTurn');
 
 function firstAvailableBus (arrivalTime, inServiceBuses) {
   let times = inServiceBuses.sort((a, b) => a-b).map(x => 0);
