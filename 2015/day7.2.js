@@ -62,9 +62,10 @@ module.exports = function runner(inputFile, verbose) {
   });
 
   const circuit = buildCircuit(inputLines, verbose);
+  circuit['b'] = 956;
   const solution = runCircuit(circuit, 'a', verbose);
 
-  assert.equal(solution, 956);
+  assert.equal(solution, 40149);
   console.log('Final Answer:', solution);
 }
 
