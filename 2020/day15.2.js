@@ -34,7 +34,14 @@ module.exports = function runner(inputFile) {
     n = nextNumberSpoken(n, index++, lookup);
   }
 
+  assert.equal(n, 1294);
+
+  while (index < 30000000 - 1) {
+    n = nextNumberSpoken(n, index++, lookup);
+    if (index % 1000000 === 1) console.log(new Date(), index, n, Object.keys(lookup).length);
+  }
+
   const solution = n;
-  assert.equal(solution, 1294);
+  assert.equal(solution, 573522);
   console.log('Final Answer:', solution);
 }

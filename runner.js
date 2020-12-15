@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --max-old-space-size=16384
 
 const yargs = require('yargs/yargs')
 const { hideBin } = require('yargs/helpers')
