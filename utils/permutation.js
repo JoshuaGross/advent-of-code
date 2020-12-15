@@ -1,3 +1,10 @@
+function swap (a, i, j) {
+  const tmp = a[i];
+  a[i] = a[j];
+  a[j] = tmp;
+  return a;
+}
+
 function* heapsAlg(arr, clone) {
   let size = arr.length
   if (typeof arr === 'string') {
