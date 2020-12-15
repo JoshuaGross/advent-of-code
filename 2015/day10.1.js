@@ -2,10 +2,6 @@ const fs = require('fs');
 const assert = require('assert');
 const lookAndSay = require('../utils/lookAndSay');
 
-function parseInput (str) {
-  return str;
-}
-
 module.exports = function runner(inputFile, verbose) {
   assert.equal(lookAndSay(1), 11);
   assert.equal(lookAndSay(11), 21);
