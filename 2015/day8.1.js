@@ -1,26 +1,9 @@
 const fs = require('fs');
 const assert = require('assert');
+const parseEscapedString = require('../utils/parseEscapedString');
 
 function parseInput (str) {
   return str.split('\n').filter(x => !!x);
-}
-
-function parseEscapedString (str) {
-  let output = '';
-  for (let i = 1; i < str.length - 1; i++) {
-    if (str[i] === '\\') {
-      let next = str[++i];
-        if (next !== "x") {
-          output += next;
-        } else if (next === "x") {
-          next = str[++i] + str[++i];
-          output += String.fromCharCode(parseInt(next, 16));
-        }
-      } else {
-        output += str[i];
-      }
-  }
-  return output;
 }
 
 function getCodeAndInMemoryLength (s) {
@@ -45,8 +28,6 @@ module.exports = function runner(inputFile, verbose) {
   const inMemoryStrLen = inputLines.reduce((acc, line) => acc + parseEscapedString(line).length, 0);
 
   const solution = codeLen - inMemoryStrLen;
-  //console.log(inputLines);
-  console.log(codeLen, inMemoryStrLen, solution);
   assert.equal(solution, 1371);
   console.log('Final Answer:', solution);
 }
