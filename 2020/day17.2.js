@@ -1,15 +1,16 @@
 const fs = require('fs');
 const assert = require('assert');
-const { range, parseConwayGridState, getConwayGridValue, conwayGridCountActiveNeighbors, conwayGetNextGridValue, stepConwayGrid, printConwayGrid } = require('../utils');
+const { parseConwayGridState } = require('../utils');
 
 module.exports = function runner(inputFile, verbose) {
   let grid = parseConwayGridState(fs.readFileSync(inputFile, 'utf8'), 4);
   for (let i = 0; i < 6; i++) {
-    grid = stepConwayGrid(grid);
+    console.log(i);
+    grid.step();
   }
 
-  const solution = [...grid.values()].reduce((acc, alive) => acc + (alive ? 1 : 0), 0);
+  const solution = grid.sum();
 
   assert.equal(solution, 1868);
   console.log('Final Answer:', solution);
-};
+}
