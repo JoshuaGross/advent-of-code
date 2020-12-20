@@ -1,5 +1,6 @@
 #!/usr/bin/env node --max-old-space-size=16384
 
+const fs = require('fs');
 const yargs = require('yargs/yargs')
 const { hideBin } = require('yargs/helpers')
 
@@ -33,7 +34,11 @@ const argv = yargs(hideBin(process.argv))
   .argv;
 
 const inputSuffix = argv.inputSuffix ? `input.${argv.inputSuffix}` : 'input';
-const inputFile = `./${argv.year}/day${argv.day}.${inputSuffix}.txt`;
 const runner = require(`./${argv.year}/day${argv.day}.${argv.part}.js`);
 
-runner(inputFile, argv.verbose);
+const inputFile = `./${argv.year}/day${argv.day}.${inputSuffix}.txt`;
+const inputPartFile = `./${argv.year}/day${argv.day}.${inputSuffix}.${argv.part}.txt`;
+
+console.log(fs.existsSync(inputPartFile) ? inputPartFile : inputFile);
+
+runner(fs.existsSync(inputPartFile) ? inputPartFile : inputFile, argv.verbose);
