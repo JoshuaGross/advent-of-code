@@ -45,12 +45,8 @@ module.exports = function runner(inputFile, verbose) {
     }
   }
 
-  let solution = 0;
-  for (const i of nonAllergenIngredients) {
-    solution += ingredientFrequency[i];
-  }
+  let solution = Object.keys(definedAllergens).sort().map(a => definedAllergens[a]).join(',');
 
-  assert.equal(solution, 2125);
+  assert.equal(solution, 'phc,spnd,zmsdzh,pdt,fqqcnm,lsgqf,rjc,lzvh');
   console.log('Final Answer:', solution);
 }
-

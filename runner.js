@@ -39,6 +39,4 @@ const runner = require(`./${argv.year}/day${argv.day}.${argv.part}.js`);
 const inputFile = `./${argv.year}/day${argv.day}.${inputSuffix}.txt`;
 const inputPartFile = `./${argv.year}/day${argv.day}.${inputSuffix}.${argv.part}.txt`;
 
-console.log(fs.existsSync(inputPartFile) ? inputPartFile : inputFile);
-
 runner(fs.existsSync(inputPartFile) ? inputPartFile : inputFile, argv.verbose);
