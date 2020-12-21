@@ -57,11 +57,11 @@ function bottom (matrix) {
 }
 
 function left (matrix) {
-  return rotateTimes(matrix, 3)[0];
+  return rotateTimes(matrix, 1)[0];
 }
 
 function right (matrix) {
-  return rotateTimes(matrix, 1)[0];
+  return rotateTimes(matrix, 3)[0];
 }
 
 function sidesEqual (side1, side2) {
@@ -99,41 +99,31 @@ function nonIntersecting (a, exclude) {
   return a.filter(x => exclude.indexOf(x) === -1);
 }
 
-module.exports = function runner(inputFile, verbose) {
-  let input = parseInput(fs.readFileSync(inputFile, 'utf8'));
+function flipIf (x, b) {
+  return b ? flip(x) : x;
+}
 
-  // For each index, find if something is a neighbor
-  const neighborMap = {};
-  for (const [label, matrix] of input) {
-    for (const [otherLabel, otherMatrix] of input) {
-      if (otherLabel === label) {
-        continue;
-      }
-
-      // Are any sides equal?
-      for (let i = 0; i < 4; i++) {
-        for (let j = 0; j < 4; j++) {
-          const rotM = top(rotateTimes(matrix, i));
-          const rotFlipM = top(rotateTimes(flip(matrix), i));
-          const rotOM = top(rotateTimes(otherMatrix, j));
-          const rotFlipOM = top(rotateTimes(flip(otherMatrix), j));
-          if (sidesEqual(rotM, rotOM)) {
-            neighborMap[label] = neighborMap[label] || [];
-            neighborMap[label].push([otherLabel, i, j, 'none', 'none']);
-          } else if (sidesEqual(rotM, rotFlipOM)) {
-            neighborMap[label] = neighborMap[label] || [];
-            neighborMap[label].push([otherLabel, i, j, 'none', 'flip']);
-          } else if (sidesEqual(rotFlipM, rotOM)) {
-            neighborMap[label] = neighborMap[label] || [];
-            neighborMap[label].push([otherLabel, i, j, 'flip', 'none']);
-          } else if (sidesEqual(rotFlipM, rotFlipOM)) {
-            neighborMap[label] = neighborMap[label] || [];
-            neighborMap[label].push([otherLabel, i, j, 'flip', 'flip']);
-          }
-        }
-      }
+function zip (a, b) {
+  let res = [];
+  for (let i = 0; i < Math.max(a.length, b.length); i++) {
+    if (a[i] && b[i]) {
+      res.push(a[i].concat(b[i]));
+    } else if (a[i]) {
+      res.push(a[i]);
+    } else if (b[i]) {
+      res.push(b[i]);
     }
   }
+  return res;
+}
+
+module.exports = function runner(inputFile, verbose) {
+  const input = parseInput(fs.readFileSync(inputFile, 'utf8'));
+  const inputMap = tuplesToMap(input);
+
+  // For each index, find if something is a neighbor
+  // This is assembled in part 1
+  const neighborMap = JSON.parse(fs.readFileSync('./2020/day20.neighborMap.txt'));
 
   // Assemble into image by finding corners first
   const tileKeys = Object.keys(neighborMap);
@@ -142,20 +132,95 @@ module.exports = function runner(inputFile, verbose) {
 
   // Fix a corner and then fill the rest of the grid
   const n = Math.sqrt(tileKeys.length);
-  const grid = [newArray(n, 0).map(row => newArray(n, null))];
-  grid[0][0] = corners[0];
-  const placedElements = [corners[0]]; // todo: flip, rotate, fixed to an adjacent cell
-  const work = [corners[0]];
+  const grid = [...newArray(n, 0).map(row => newArray(n, null))];
+  console.log(corners[0], neighborMap[corners[0]]);
+  grid[0][0] = [corners[0], 2, 'none']; // assume 2 rotation, no flip
+  const placedElements = [corners[0]];
+  const work = [[corners[0], 2, 'none', 0, 0]];
+  tileKeys.splice(tileKeys.indexOf(corners[0]), 1);
 
-  while (work.length > 0) {
-    const item = work.shift();
-    const neighbors
+  // Fill each spot in the grid
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (grid[i][j]) {
+        continue;
+      }
+      const leftNeighbor = grid[i][j - 1] || null;
+      const topNeighbor  = (grid[i - 1] || {})[j] || null;
+      let match;
+      for (const tileKey of tileKeys) {
+        const neighborLeft = leftNeighbor && right(rotateTimes(flipIf(inputMap[leftNeighbor[0]], leftNeighbor[2]), leftNeighbor[1]));
+        const neighborUp = topNeighbor && right(rotateTimes(flipIf(inputMap[topNeighbor[0]], topNeighbor[2]), topNeighbor[1]));
+        for (const flip of [true, false]) {
+          for (const rotate of [0, 1, 2, 3]) {
+            const tile = rotateTimes(flipIf(inputMap[tileKey], flip), rotate);
+            const leftSideEqual = (neighborLeft && sidesEqual(right(neighborLeft), left(tile))) || !neighborLeft;
+            const topSideEqual = (neighborUp && sidesEqual(bottom(neighborUp), top(tile))) || !neighborUp;
+            if (leftSideEqual && topSideEqual) {
+              grid[i][j] = [tileKey, rotate, flip];
+              tileKeys.splice(tileKeys.indexOf(tileKey), 1);
+              match = tileKey;
+            }
+            if (match) break;
+          }
+          if (match) break;
+        }
+        if (match) break;
+      }
+      //console.log(i, j, match, grid[i][j]);
+    }
   }
 
-  console.log(corners, grid, n, neighborMap[grid[0][0]]);
+  let txtGrid = '';
+
+  // Build grid, stripping off borders
+  for (let i = 0; i < n; i++) {
+    let gridLine = []
+    for (let j = 0; j < n; j++) {
+      const [tileKey, rotate, flip] = grid[i][j];
+      const segment = rotateTimes(flipIf(inputMap[tileKey], flip), rotate);
+      const borderless = segment.slice(1, -1).map(line => line.slice(1, -1));
+      gridLine = zip(gridLine, borderless);
+      //console.log(i,j,gridLine);
+    }
+    txtGrid += gridLine.map(line => line.join('')).join('\n') + '\n';
+  }
+  txtGrid = txtGrid.split('\n').filter(x => !!x);
+
+  // Count sea monsters
+  let numPoundSymbols = txtGrid.join('').split('').filter(ch => ch === '#').length;
+  const pattern = ('                  # \n' +
+                   '#    ##    ##    ###\n' +
+                   ' #  #  #  #  #  #   ').split('\n').map(line => line.split(''));
+
+  // this seems close, but isn't actually working yet
+  let maxMonsters = 0;
+  for (const flip of [true, false]) {
+    for (const rotate of [0, 1, 2, 3]) {
+      const mutatedGrid = rotateTimes(flipIf(txtGrid.map(line => line.split('')), flip), rotate);
+      let gridMonsters = 0;
+      for (let row = 0; row < mutatedGrid.length - pattern.length; row++) {
+        for (let col = 0; col < mutatedGrid[0].length - pattern[0].length; col++) {
+          let foundMonster = true;
+          for (let i = 0; i < pattern.length && foundMonster; i++) {
+            for (let j = 0; j < pattern[i].length && foundMonster; j++) {
+              foundMonster = foundMonster && (pattern[i][j] !== '#' || pattern[i][j] === mutatedGrid[row+i][col+j]);
+              if (!foundMonster) {
+                console.log(flip, rotate, row, col, i, j, pattern[i][j], mutatedGrid[row+i][col+j]);
+              }
+            }
+          }
+          if (foundMonster) gridMonsters++;
+        }
+      }
+      maxMonsters = Math.max(maxMonsters, gridMonsters);
+    }
+  }
+
+  console.log(txtGrid, numPoundSymbols, maxMonsters);
 
   const solution = 0;
 
-  assert.equal(solution, 0);
+  assert.equal(solution, 2118);
   console.log('Final Answer:', solution);
 }

@@ -100,9 +100,6 @@ module.exports = function runner(inputFile, verbose) {
           } else if (sidesEqual(rotFlipM, rotOM)) {
             neighborMap[label] = neighborMap[label] || [];
             neighborMap[label].push([otherLabel, i, j, 'flip', 'none']);
-          } else if (sidesEqual(rotFlipM, rotFlipOM)) {
-            neighborMap[label] = neighborMap[label] || [];
-            neighborMap[label].push([otherLabel, i, j, 'flip', 'flip']);
           }
         }
       }
@@ -110,6 +107,8 @@ module.exports = function runner(inputFile, verbose) {
   }
 
   const solution = product(...Object.keys(neighborMap).map(k => [k, ([...new Set(neighborMap[k].map(x => x[0]))]).length]).filter(x => x[1] === 2).map(x => parseInt(x[0], 10)));
+
+  fs.writeFileSync('./2020/day20.neighborMap.txt', JSON.stringify(neighborMap));
 
   assert.equal(solution, 18482479935793);
   console.log('Final Answer:', solution);
